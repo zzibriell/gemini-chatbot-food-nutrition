@@ -105,34 +105,48 @@ document.addEventListener("DOMContentLoaded", () => {
     return response.json();
   }
 
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+const regionImages = document.querySelector(".region-images");
+    const chatForm = document.getElementById("chat-form");
 
-    const userText = input.value.trim();
-    if (!userText) {
-      return;
+    function updateRegionImagesPosition() {
+      if (!regionImages || !chatForm) return;
+      const containerRect = chatForm.parentElement.getBoundingClientRect();
+      const chatFormRect = chatForm.getBoundingClientRect();
+      const top = chatFormRect.bottom - containerRect.top + 10;
+      regionImages.style.top = `${top}px`;
     }
 
-    appendMessage("user", userText);
-    input.value = "";
-    input.focus();
+    window.addEventListener("resize", updateRegionImagesPosition);
+    updateRegionImagesPosition();
 
-    const thinkingEl = appendMessage("bot", "Thinking");
-    thinkingEl.classList.add("typing");
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
 
-    try {
-      const data = await sendMessage(userText);
-      const aiReply =
-        data && typeof data.result === "string" ? data.result.trim() : "";
+      const userText = input.value.trim();
+      if (!userText) {
+        return;
+      }
 
-      thinkingEl.classList.remove("typing");
-      thinkingEl.innerHTML = renderMarkdown(
-        aiReply || "Sorry, no response received."
-      );
-    } catch (error) {
-      console.error("Chat request failed:", error);
-      thinkingEl.classList.remove("typing");
-      thinkingEl.textContent = "Failed to get response from server.";
-    }
+      appendMessage("user", userText);
+      input.value = "";
+      input.focus();
+
+      const thinkingEl = appendMessage("bot", "Thinking");
+      thinkingEl.classList.add("typing");
+
+      try {
+        const data = await sendMessage(userText);
+        const aiReply =
+          data && typeof data.result === "string" ? data.result.trim() : "";
+
+        thinkingEl.classList.remove("typing");
+        thinkingEl.innerHTML = renderMarkdown(
+          aiReply || "Sorry, no response received."
+        );
+      } catch (error) {
+        console.error("Chat request failed:", error);
+        thinkingEl.classList.remove("typing");
+        thinkingEl.textContent = "Failed to get response from server.";
+      }
+    });
   });
-});
