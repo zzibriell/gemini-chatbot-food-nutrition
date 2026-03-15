@@ -133,6 +133,7 @@ const regionImages = document.querySelector(".region-images");
 
       const thinkingEl = appendMessage("bot", "Thinking");
       thinkingEl.classList.add("typing");
+      const thinkingBubble = thinkingEl.querySelector('.message--bot');
 
       try {
         const data = await sendMessage(userText);
@@ -140,13 +141,17 @@ const regionImages = document.querySelector(".region-images");
           data && typeof data.result === "string" ? data.result.trim() : "";
 
         thinkingEl.classList.remove("typing");
-        thinkingEl.innerHTML = renderMarkdown(
-          aiReply || "Sorry, no response received."
-        );
+        if (thinkingBubble) {
+          thinkingBubble.innerHTML = renderMarkdown(
+            aiReply || "Sorry, no response received."
+          );
+        }
       } catch (error) {
         console.error("Chat request failed:", error);
         thinkingEl.classList.remove("typing");
-        thinkingEl.textContent = "Failed to get response from server.";
+        if (thinkingBubble) {
+          thinkingBubble.textContent = "Failed to get response from server.";
+        }
       }
     });
   });
